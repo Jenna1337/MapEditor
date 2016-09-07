@@ -1,0 +1,21 @@
+import java.util.Base64;
+
+public class Main
+{
+	public static void main(String[] args)
+	{
+		String src = "AQEAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAMAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAwAAAAIAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAwAAAAMAAAADAAAAAgAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAMAAAADAAAAAwAAAAMAAAACAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAADAAAAAwAAAAMAAAADAAAAAwAAAAIAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAA==";
+		byte[] bytes = Base64.getDecoder().decode(src);
+		int[] ints = new int[bytes.length/4];
+		for(int i=0;i<ints.length;++i)
+			ints[i]=bytes[i*4];
+		String[] hexbytes = new String[bytes.length];
+			for(int i=0;i<bytes.length;++i)
+				hexbytes[i]=Integer.toHexString(bytes[i]);
+		System.out.println(java.util.Arrays.toString(hexbytes));
+		
+		long long b = 0xffffffffffffffffffffffffffffffff;
+		
+		// TODO Auto-generated method stub
+	}
+}

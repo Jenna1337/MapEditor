@@ -51,6 +51,7 @@ public class MapBase64
 				dat[i] = val;
 			}
 			
+			Tile[] tls=null;
 			//TODO get Tile[]
 			
 			return new Map(w,h,tls);

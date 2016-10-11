@@ -1,9 +1,26 @@
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.Base64;
+import mapdat.Tile;
 
 public class Main
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
+		String floc = "tiletest5.bmp";
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(floc)));
+		String data = "";
+		int ch;
+		while((ch=reader.read())!=-1)
+			data+=new String(Character.toChars(ch));
+		reader.close();
+		Tile t = new Tile(0, Base64.getEncoder().encodeToString(data.getBytes()));
+		System.out.println(t.getImg());
+		System.out.println(t);
+		
+		System.exit(0);
+		
 		String src = "AQEAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAIAAAACAAAAAgAAAAMAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAwAAAAIAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAwAAAAMAAAADAAAAAgAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAMAAAADAAAAAwAAAAMAAAACAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAADAAAAAwAAAAMAAAADAAAAAwAAAAIAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAA==";
 		byte[] bytes = Base64.getDecoder().decode(src);
 		int[] ints = new int[bytes.length/4];
@@ -14,8 +31,7 @@ public class Main
 				hexbytes[i]=Integer.toHexString(bytes[i]);
 		System.out.println(java.util.Arrays.toString(hexbytes));
 		
-		long long b = 0xffffffffffffffffffffffffffffffff;
-		
+				
 		// TODO Auto-generated method stub
 	}
 }

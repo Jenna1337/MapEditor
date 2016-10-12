@@ -9,29 +9,45 @@ import java.util.Base64;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
-public class ImageBase64
+public class ImageBase64 implements Base64Converter<BufferedImage>
 {
+	// Use the most compressed and lossless format.
 	private static final String formatName = "PNG";
 	
 	private ImageBase64()
 	{
 	}
 	
+	private static ImageBase64 instance = new ImageBase64();
+	
+	public static ImageBase64 getInstance()
+	{
+		return instance;
+	}
+	
 	/**
 	 * @param data64 - the base 64 data.
 	 * @return The image represented by the data.
-	 * @throws IOException if the data does not represent a valid image file.
+	 * @throws Base64Exception if the data does not represent a valid image
+	 *             file.
 	 */
-	public static BufferedImage fromBase64(String data64) throws IOException
+	public BufferedImage fromBase64(String data64) throws Base64Exception
 	{
-		byte[] data = Base64.getDecoder().decode(data64);
-		File tmp = File.createTempFile("img64_" + data64.hashCode(), "tmp");
-		RandomAccessFile raf = new RandomAccessFile(tmp, "rws");
-		raf.write(data);
-		raf.close();
-		return ImageIO.read(tmp);
+		try
+		{
+			byte[] data = Base64.getDecoder().decode(data64);
+			File tmp = File.createTempFile("img64_" + data64.hashCode(), "tmp");
+			RandomAccessFile raf = new RandomAccessFile(tmp, "rws");
+			raf.write(data);
+			raf.close();
+			return ImageIO.read(tmp);
+		}
+		catch(IOException e)
+		{
+			throw new Base64Exception(e);
+		}
 	}
-	public static String toBase64(BufferedImage buffimg)
+	public String toBase64(BufferedImage buffimg)
 	{
 		try
 		{

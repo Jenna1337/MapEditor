@@ -1,8 +1,8 @@
 package datautils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import mapdat.Map;
-import mapdat.Tile;
 
 /**
  * 
@@ -10,95 +10,55 @@ import mapdat.Tile;
  * @see BaseDen.Decoder
  * @see BaseDen.Encoder
  */
-public class MapBase64
+public class MapBase64 implements Base64Converter<Map>
 {
-	/**
-	 * 
-	 * @author jonah.sloan
-	 * @see Encoder
-	 */
-	public static class Decoder
+	private MapBase64()
 	{
-		private static final Base64.Decoder Dec64 = Base64.getDecoder();
-		
-		public static Map decode(byte[] src64)
-		{
-			byte[] raw = Dec64.decode(src64);
-			if(raw.length%Integer.BYTES != 0)
-				throw new IllegalArgumentException("Not a valid Base64 map");
-			
-			int w=0;
-			w |= raw[0]; w<<=8;
-			w |= raw[1]; w<<=8;
-			w |= raw[2]; w<<=8;
-			w |= raw[3];
-			
-			int h=0;
-			w |= raw[4]; w<<=8;
-			w |= raw[5]; w<<=8;
-			w |= raw[6]; w<<=8;
-			w |= raw[7];
-			
-			int[] dat = new int[w*h];
-			
-			for(int i=0;i<dat.length;++i)
-			{
-				int val=0;
-				val |= raw[i*4+ 8]; val<<=8;
-				val |= raw[i*4+ 9]; val<<=8;
-				val |= raw[i*4+10]; val<<=8;
-				val |= raw[i*4+11];
-				dat[i] = val;
-			}
-			
-			Tile[] tls=null;
-			//TODO get Tile[]
-			
-			return new Map(w,h,tls);
-		}
-	}
-	/**
-	 * 
-	 * @author jonah.sloan
-	 * @see Decoder
-	 */
-	public static class Encoder
-	{
-		private static final Base64.Encoder Enc64 = Base64.getEncoder();
-		
-		public static byte[] encode(Map m)
-		{
-			int[] dat = new int[2+m.getHeight()*m.getWidth()];
-			
-			dat[0]=m.getWidth();
-			dat[1]=m.getHeight();
-			
-			Tile[] tls = m.getTiles();
-			for(int i=0; i<tls.length; ++i)
-				dat[i+2]=tls[i].getId();
-			
-			byte[] raw = new byte[Integer.BYTES*dat.length];
-			for(int i=0;i<dat.length;++i)
-			{
-				int tid=dat[i];
-				raw[i*4  ] = (byte)tid;
-				raw[i*4+1] = (byte)(tid>>=8);
-				raw[i*4+2] = (byte)(tid>>=8);
-				raw[i*4+3] = (byte)(tid>>=8);
-			}
-			return Enc64.encode(raw);
-		}
 	}
 	
-	private static final Decoder decoder = new Decoder();
-	private static final Encoder encoder = new Encoder();
+	private static MapBase64 instance = new MapBase64();
 	
-	public static Decoder getDecoder()
+	public static MapBase64 getInstance()
 	{
-		return decoder;
+		return instance;
 	}
-	public static Encoder getEncoder()
+	
+	public Map fromBase64(String src64) throws Base64Exception
 	{
-		return encoder;
+		String raw = new String(Base64.getDecoder().decode(src64),
+				StandardCharsets.ISO_8859_1);
+		String[] rows = raw.split("\\v+");
+		int[][] dat = new int[rows[0].length()][rows.length];
+		int h = dat[0].length;
+		;
+		
+		for(int y = 0; y < h; ++y)
+		{
+			String[] cols = rows[y].split(",\\s*");
+			for(int x = 0; x < cols.length; ++x)
+				dat[y][x] = Integer.parseInt(cols[x]);
+		}
+		
+		return new Map(dat);
+	}
+	public String toBase64(Map m)
+	{
+		int[][] dat = new int[m.getHeight()][m.getWidth()];
+		int h = m.getHeight(), w = m.getWidth();
+		for(int y = 0; y < h; ++y)
+			for(int x = 0; x < w; ++x)
+				dat[y][x] = m.getTile(x, y).getId();
+		String raw = "";
+		for(int y = 0; y < h; ++y)
+		{
+			for(int x = 0; x < w; ++x)
+			{
+				raw += m.getTile(x, y).getId();
+				if(y < h - 1 && x < w - 1)// check if last item
+					raw += ",";
+			}
+			raw += System.lineSeparator();
+		}
+		return Base64.getEncoder().encodeToString(raw.getBytes(StandardCharsets.ISO_8859_1));
 	}
 }

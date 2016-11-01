@@ -1,4 +1,4 @@
-package datautils;
+package utils.base64;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -9,6 +9,10 @@ import java.util.Base64;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
+
+/**
+ * @deprecated Use {@link Tile#toImageBytes(String)}
+ */
 public class ImageBase64 implements Base64Converter<BufferedImage>
 {
 	// Use the most compressed and lossless format.
@@ -30,6 +34,7 @@ public class ImageBase64 implements Base64Converter<BufferedImage>
 	 * @return The image represented by the data.
 	 * @throws Base64Exception if the data does not represent a valid image
 	 *             file.
+	 * @deprecated Use Tile.readImageString(InputStream) instead;
 	 */
 	public BufferedImage fromBase64(String data64) throws Base64Exception
 	{
@@ -47,6 +52,9 @@ public class ImageBase64 implements Base64Converter<BufferedImage>
 			throw new Base64Exception(e);
 		}
 	}
+	/**
+	 * @deprecated Use Tile.toImageBytes() instead;
+	 */
 	public String toBase64(BufferedImage buffimg)
 	{
 		try

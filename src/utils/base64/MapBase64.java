@@ -1,4 +1,4 @@
-package datautils;
+package utils.base64;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

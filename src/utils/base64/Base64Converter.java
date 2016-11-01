@@ -1,4 +1,4 @@
-package datautils;
+package utils.base64;
 
 public interface Base64Converter<T>
 {

@@ -19,9 +19,20 @@ public class Tile
 		this.id = id;
 		this.img = img;
 	}
+	public Tile(InputStream stream) throws IOException
+	{
+		byte[] idba = new byte[4];
+		if(stream.read(idba, 0, 4) != 4)
+			throw new IOException("Failed to get id!");
+		BufferedImage img = readImageString(stream);
+		if(img==null)
+			throw new NullPointerException("image == null!");
+		this.id = toInt(idba);
+		this.img = img;
+	}
 	public String toString()
 	{
-		return "Tile("+id+", \""+getImg()+"\")";
+		return "Tile("+id+", BufferedImage@"+Integer.toHexString(getImg().hashCode())+")";
 	}
 	public int getId()
 	{
@@ -32,6 +43,17 @@ public class Tile
 		return img;
 	}
 	
+	public byte[] toBytes() throws IOException
+	{
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		ImageIO.write(img, format, bytes);
+		String data = bytes.toString();
+		bytes.reset();
+		bytes.write(toByta(id), 0, 4);
+		bytes.write(toByta(data.length()), 0, 4);
+		bytes.write(data.getBytes());
+		return bytes.toByteArray();
+	}
 	public byte[] toImageBytes() throws IOException
 	{
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();

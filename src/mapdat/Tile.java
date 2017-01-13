@@ -5,98 +5,63 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import javax.imageio.ImageIO;
+import game.CollisionType;
+import game.TileType;
 
-public class Tile
+public class Tile extends TileType
 {
 	private static final String format = "PNG";
-	private int id;
-	private BufferedImage img;
 	
-	public Tile(int id, BufferedImage img)
+	public Tile(int id, CollisionType collision, String imagepath)
 	{
-		this.id = id;
-		this.img = img;
+		super(id, collision, imagepath);
 	}
 	public Tile(InputStream stream) throws IOException
 	{
-		byte[] idba = new byte[4];
-		if(stream.read(idba, 0, 4) != 4)
-			throw new IOException("Failed to get id!");
-		BufferedImage img = readImageString(stream);
-		if(img==null)
-			throw new NullPointerException("image == null!");
-		this.id = toInt(idba);
-		this.img = img;
+		super(stream);
 	}
-	public String toString()
+	public Tile(int id, CollisionType ctype,
+			BufferedImage bufferedImage)
 	{
-		return "Tile("+id+", BufferedImage@"+Integer.toHexString(getImg().hashCode())+")";
+		super(id, ctype, saveTempImage(bufferedImage));
 	}
-	public int getId()
+	private static String saveTempImage(BufferedImage bufferedImage)
 	{
-		return id;
+		try
+		{
+			File tempFile = File.createTempFile(System.currentTimeMillis()+"_IMG"+bufferedImage.hashCode(), format);
+			boolean success = ImageIO.write(bufferedImage, format, tempFile);
+			if(!success)
+				throw new IOException("No appropriate writer found for \"" +
+						format + "\"");
+			return tempFile.getAbsolutePath();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return null;
 	}
-	public BufferedImage getImg()
-	{
-		return img;
-	}
-	
 	public byte[] toBytes() throws IOException
 	{
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		ImageIO.write(img, format, bytes);
+		ImageIO.write(getImage(), format, bytes);
 		String data = bytes.toString();
 		bytes.reset();
-		bytes.write(toByta(id), 0, 4);
+		bytes.write(toByta(getId()), 0, 4);
 		bytes.write(toByta(data.length()), 0, 4);
 		bytes.write(data.getBytes());
 		return bytes.toByteArray();
+		//TODO collision
 	}
-	public byte[] toImageBytes() throws IOException
-	{
-		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		ImageIO.write(img, format, bytes);
-		String data = bytes.toString();
-		bytes.reset();
-		bytes.write(toByta(data.length()), 0, 4);
-		bytes.write(data.getBytes());
-		return bytes.toByteArray();
-	}
-	public static BufferedImage readImageString(InputStream stream) throws IOException
-	{
-		byte[] nbba = new byte[4];
-		if(stream.read(nbba, 0, 4) != 4)
-			throw new IOException("Failed to get image size!");
-		int numbytes = toInt(nbba);
-		byte[] bytes = new byte[numbytes];
-		int bytesread = stream.read(bytes);
-		if(bytesread != numbytes)
-			throw new IOException("Failed to read correct amount of bytes!");
-		File tmp = File.createTempFile("img"+bytes.hashCode(), "."+format);
-		RandomAccessFile raf = new RandomAccessFile(tmp, "rws");
-		raf.write(bytes);
-		raf.close();
-		BufferedImage img = ImageIO.read(tmp);
-		return img;
-	}
-	public static byte[] toByta(int data) {
+	private static byte[] toByta(int data) {
 		return new byte[] {
 				(byte)((data >> 24) & 0xff),
 				(byte)((data >> 16) & 0xff),
 				(byte)((data >> 8) & 0xff),
 				(byte)((data >> 0) & 0xff),
 		};
-	}
-	public static int toInt(byte[] data) {
-		if (data == null || data.length != 4) return 0x0;
-		// ----------
-		return (int)( // NOTE: type cast not necessary for int
-				(0xff & data[0]) << 24  |
-				(0xff & data[1]) << 16  |
-				(0xff & data[2]) << 8   |
-				(0xff & data[3]) << 0
-				);
 	}
 }

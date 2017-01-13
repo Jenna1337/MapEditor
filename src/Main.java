@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Comparator;
+import game.CollisionType;
 import mapdat.Tile;
 
 public class Main
@@ -11,7 +12,7 @@ public class Main
 	public static void main(String[] args) throws Exception
 	{
 		File tmp = File.createTempFile("tile", "dat");
-		Tile tile = new Tile(5,
+		Tile tile = new Tile(5, CollisionType.TUNNEL_VERTICAL, 
 				new BufferedImage(1, 5, BufferedImage.TYPE_4BYTE_ABGR));
 		byte[] img = tile.toBytes();
 		FileOutputStream fout = new FileOutputStream(tmp);
@@ -52,6 +53,6 @@ public class Main
 				return -1;
 			}
 		};
-		System.out.println(imgcomp.compare(tile.getImg(), tile2.getImg()) == 0);
+		System.out.println(imgcomp.compare(tile.getImage(), tile2.getImage()) == 0);
 	}
 }
